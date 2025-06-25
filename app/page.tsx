@@ -1,20 +1,14 @@
-import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
 
-const Chat = dynamic(() => import("@/components/Chat"), {
+// Use dynamic import to avoid SSR issues with browser-only code
+const VapiChat = dynamic(() => import("@/components/VapiChat"), {
   ssr: false,
 });
 
-export default async function Page() {
-  const accessToken = await getHumeAccessToken();
-
-  if (!accessToken) {
-    throw new Error('Unable to get access token');
-  }
-
+export default function Page() {
   return (
-    <div className={"grow flex flex-col"}>
-      <Chat accessToken={accessToken} />
+    <div className={"grow flex flex-col h-[calc(100vh-4rem)]"}>
+      <VapiChat />
     </div>
   );
 }

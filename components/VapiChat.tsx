@@ -29,6 +29,7 @@ export default function VapiChat() {
   const [outfitDescription, setOutfitDescription] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisDetails, setAnalysisDetails] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages change
@@ -51,7 +52,7 @@ export default function VapiChat() {
           {
             id: `assistant-${Date.now()}`,
             role: 'assistant',
-            text: "Hello! I'm your fashion assistant. I can help with your outfit colors and style. What would you like to know?",
+            text: "Hello! I'm your fashion assistant. I've analyzed your outfit and I'm ready to help. What would you like to know about your outfit?",
             timestamp: Date.now(),
           },
         ]);
@@ -90,11 +91,21 @@ export default function VapiChat() {
             timestamp: Date.now(),
           },
         ]);
+        
+        // Try to restart the connection if it fails
+        setTimeout(() => {
+          if (!isConnected) {
+            const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+            if (assistantId && outfitDescription) {
+              startVapiConversation(assistantId, outfitDescription);
+            }
+          }
+        }, 3000);
       },
     });
 
     return cleanupListeners;
-  }, [outfitDescription]);
+  }, [outfitDescription, isConnected]);
 
   // Start the conversation when we get an outfit description
   useEffect(() => {
@@ -115,6 +126,14 @@ export default function VapiChat() {
     setOutfitDescription(description);
     setIsAnalyzing(false);
     
+    // Extract a summary from the analysis for display
+    const summaryMatch = description.match(/## COLOR IDENTIFICATION([\s\S]*?)##/);
+    const summary = summaryMatch 
+      ? summaryMatch[1].trim() 
+      : "Analysis complete! Ready to discuss your outfit.";
+    
+    setAnalysisDetails(description);
+    
     // Add initial analysis message
     setMessages([
       {
@@ -131,6 +150,7 @@ export default function VapiChat() {
     setIsConnected(false);
     setIsSpeaking(false);
     setOutfitDescription(null);
+    setAnalysisDetails(null);
     setMessages([]);
   };
 
@@ -144,15 +164,29 @@ export default function VapiChat() {
     }
   };
 
+  const handleNewUpload = () => {
+    // End current call if active
+    if (isConnected) {
+      stopVapiConversation();
+    }
+    
+    // Reset states for new analysis
+    setIsConnected(false);
+    setIsSpeaking(false);
+    setOutfitDescription(null);
+    setAnalysisDetails(null);
+    setMessages([]);
+  };
+
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto w-full">
       <div className="flex-1 overflow-y-auto p-4">
         {!outfitDescription && !isAnalyzing && (
           <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-2xl font-bold mb-6">Color Assistant</h1>
+            <h1 className="text-2xl font-bold mb-6">Fashion Color Assistant</h1>
             <p className="text-center text-muted-foreground mb-8 max-w-md">
               Upload a photo of your outfit and get real-time fashion advice, 
-              especially designed for colorblind individuals.
+              specially designed for colorblind individuals.
             </p>
             <ImageUploader 
               onImageAnalyzed={handleImageAnalyzed}
@@ -171,6 +205,24 @@ export default function VapiChat() {
 
         {messages.length > 0 && (
           <div className="space-y-4 pt-4">
+            {analysisDetails && outfitDescription && (
+              <div className="bg-muted/30 border border-border rounded-lg p-4 mb-6">
+                <h3 className="font-medium mb-2">Outfit Analysis</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  The fashion assistant has analyzed your outfit and is ready to chat.
+                  Ask questions about colors, style, and coordination.
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="mt-2"
+                  onClick={handleNewUpload}
+                >
+                  Upload New Image
+                </Button>
+              </div>
+            )}
+            
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -221,11 +273,11 @@ export default function VapiChat() {
               </Toggle>
 
               <div className="relative h-8 w-48 shrink grow-0 flex items-center">
-                {/* Audio visualization placeholder */}
+                {/* Audio visualization */}
                 <div 
                   className={cn(
-                    "h-1 bg-primary rounded-full transition-all duration-75 ease-in-out",
-                    isSpeaking ? "w-full" : "w-8"
+                    "h-2 bg-primary rounded-full transition-all duration-75 ease-in-out",
+                    isSpeaking ? "animate-pulse w-full" : "w-8"
                   )}
                 ></div>
               </div>

@@ -1,97 +1,118 @@
-# DripNow - Colorblind Fashion Assistant
+# DripNow: Fashion Assistant for Colorblind Users
 
-A voice-enabled fashion assistant specifically designed to help colorblind individuals understand and coordinate their outfits.
-
-## Features
-
-- **Image Analysis**: Upload photos of your outfits for detailed color and style analysis using Google's Gemini Vision API
-- **Voice Conversations**: Get real-time fashion advice through natural voice conversations powered by VAPI
-- **Color Education**: Learn about color combinations and style rules tailored for colorblind users
-- **Responsive Design**: Works on both desktop and mobile devices
+DripNow is a real-time speech-based fashion advisor designed specifically for colorblind individuals. The app helps users understand the colors in their outfits, provides coordination advice, and offers fashion tips through a natural voice conversation.
 
 ## How It Works
 
-1. Users upload a photo of their outfit
-2. Google Gemini analyzes the image and provides a detailed description of colors and style
-3. This description is sent to VAPI's voice assistant as context
-4. Users can have natural voice conversations with the assistant about their outfit
+1. **Upload an outfit image**: Users take a photo or upload an image of their outfit
+2. **AI Analysis**: Google's Gemini Vision API analyzes the outfit and provides detailed color information
+3. **Voice Conversation**: Users talk with a Vapi-powered voice assistant to get fashion advice
 
-## Getting Started
+## Features
 
-### Prerequisites
-
-- Node.js (v16+)
-- PNPM (recommended) or NPM
-- Google Gemini API key
-- VAPI account and API keys
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/dripnow.git
-cd dripnow
-```
-
-2. Install dependencies
-```bash
-pnpm install
-# or
-npm install
-```
-
-3. Create a `.env.local` file based on `.env.example`
-```bash
-cp .env.example .env.local
-```
-
-4. Add your API keys to the `.env.local` file:
-```
-GEMINI_API_KEY=your_gemini_api_key_here
-NEXT_PUBLIC_VAPI_API_KEY=your_vapi_public_api_key_here
-NEXT_PUBLIC_VAPI_ASSISTANT_ID=your_vapi_assistant_id_here
-```
-
-### VAPI Assistant Setup
-
-1. Create a new assistant in your [VAPI Dashboard](https://app.vapi.ai)
-2. Configure your assistant with appropriate settings:
-   - Model: We recommend GPT-4o or similar for best quality advice
-   - Voice: Choose a natural-sounding voice that's easy to understand
-   - System Prompt: Include color theory basics and fashion advice
-
-3. Copy the assistant ID to your `.env.local` file
-
-### Running the Application
-
-```bash
-pnpm dev
-# or
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-## Usage
-
-1. Allow microphone access when prompted
-2. Upload a photo of your outfit using the interface
-3. Wait for the analysis to complete
-4. Start speaking with the assistant about your outfit
-5. Ask questions about colors, style, and possible improvements
+- **Image Analysis**: Detailed breakdown of clothing colors with specific color names and coordination information
+- **Voice Interface**: Natural speech conversation for asking questions about the outfit
+- **Colorblind-Specific**: Provides advice tailored for people who have difficulty distinguishing colors
+- **Real-time Feedback**: Interactive conversation with immediate responses
 
 ## Tech Stack
 
-- **Next.js**: React framework for the frontend
-- **Google Gemini**: Multimodal AI for image analysis
-- **VAPI**: Voice assistant platform for natural conversations
-- **TailwindCSS**: Utility-first CSS framework for styling
-- **Framer Motion**: Animation library
+- **Frontend**: Next.js, React, and TypeScript
+- **UI Components**: Shadcn UI components with Tailwind CSS
+- **AI Vision**: Google Gemini Pro Vision API for image analysis
+- **Voice AI**: Vapi.ai for real-time voice conversations
+- **Animation**: Framer Motion for smooth UI transitions
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js 18+ and npm/yarn/pnpm
+- Google Gemini API key
+- Vapi.ai account with API key and assistant setup
+
+### Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```
+# Gemini API key for image analysis
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# VAPI public API key (for client-side usage)
+NEXT_PUBLIC_VAPI_API_KEY=your_vapi_public_api_key_here
+
+# VAPI assistant ID (created in your VAPI dashboard)
+NEXT_PUBLIC_VAPI_ASSISTANT_ID=your_vapi_assistant_id_here
+```
+
+### Vapi Assistant Setup
+
+1. Create a Vapi account at [vapi.ai](https://vapi.ai)
+2. Create a new assistant with the following settings:
+   - **Model**: Choose GPT-4 or equivalent for best results
+   - **Voice**: Select a natural-sounding voice (Alloy or Nova recommended)
+   - **Configure your assistant to be helpful and knowledgeable about fashion and color theory**
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+# or
+yarn install
+# or
+pnpm install
+
+# Run development server
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the application.
+
+## Usage Guide
+
+1. Open the application in your browser
+2. Click "Upload Image" or "Take Photo" to capture your outfit
+3. Wait a few seconds for the AI to analyze the image
+4. Once analysis is complete, the voice assistant will automatically connect
+5. Start talking to the assistant about your outfit
+6. Ask questions like:
+   - "What colors am I wearing?"
+   - "Do these colors go well together?"
+   - "What other colors would match with this shirt?"
+   - "Is this appropriate for a formal event?"
+
+## Development
+
+### Project Structure
+
+```
+/
+├── app/                # Next.js app router
+│   ├── api/            # API routes
+│   │   └── analyze-outfit/ # Image analysis endpoint
+│   └── page.tsx        # Main application page
+├── components/         # React components
+│   ├── ImageUploader.tsx  # Image upload component
+│   ├── VapiChat.tsx    # Voice assistant component
+│   └── ui/             # UI components
+├── utils/              # Utility functions
+│   ├── getGeminiAnalysis.ts # Gemini API integration
+│   └── vapiService.ts  # Vapi.ai integration
+└── public/             # Static assets
+```
+
+## Troubleshooting
+
+- **Microphone Access**: Ensure you've granted microphone permissions to the browser
+- **Image Analysis Errors**: Make sure the image is clear and well-lit
+- **Voice Assistant Not Connecting**: Check your API keys in the .env file
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Built with ❤️ to help colorblind individuals navigate fashion with confidence
+[MIT License](LICENSE)

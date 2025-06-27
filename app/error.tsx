@@ -20,14 +20,16 @@ export default function Error({
           <p className={"text-muted-foreground text-sm"}>{error.message}</p>
         </div>
         <div className={"pt-4 flex gap-2"}>
-          <Button className={"rounded-full flex-1"} variant={"secondary"} asChild>
-            <Link href={"https://dev.hume.ai/"} target={"_blank"}>
-              View Documentation
+          <div className="mt-4">
+            <Link href={"https://docs.vapi.ai/"} target={"_blank"}>
+              <Button className="text-sm" variant="outline">
+                View Documentation
+              </Button>
             </Link>
-          </Button>
-          <Button className={"rounded-full flex-1"} onClick={reset}>
-            Try again
-          </Button>
+            <Button className={"rounded-full flex-1"} onClick={reset}>
+              Try again
+            </Button>
+          </div>
         </div>
       </div>
     </div>

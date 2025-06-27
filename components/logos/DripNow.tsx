@@ -1,4 +1,4 @@
-import type { SVGAttributes } from "react";
+import { SVGAttributes } from "react";
 import { useId } from "react";
 
 export type DripNowLogoProps = SVGAttributes<SVGSVGElement>;

@@ -1,15 +1,26 @@
 "use client";
-import { useVoice } from "@humeai/voice-react";
+
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Mic, MicOff, Phone } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toggle } from "./ui/toggle";
-import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
+import { 
+  muteVapiMic, 
+  unmuteVapiMic, 
+  stopVapiConversation 
+} from "@/utils/vapiService";
 
-export default function Controls() {
-  const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+export interface ControlsProps {
+  isConnected: boolean;
+  isMuted: boolean;
+  isSpeaking: boolean;
+  onMuteToggle: () => void;
+  onEndCall: () => void;
+}
 
+export default function Controls({ isConnected, isMuted, isSpeaking, onMuteToggle, onEndCall }: ControlsProps) {
   return (
     <div
       className={
@@ -20,7 +31,7 @@ export default function Controls() {
       }
     >
       <AnimatePresence>
-        {status.value === "connected" ? (
+        {isConnected ? (
           <motion.div
             initial={{
               y: "100%",
@@ -41,13 +52,7 @@ export default function Controls() {
             <Toggle
               className={"rounded-full"}
               pressed={!isMuted}
-              onPressedChange={() => {
-                if (isMuted) {
-                  unmute();
-                } else {
-                  mute();
-                }
-              }}
+              onPressedChange={onMuteToggle}
             >
               {isMuted ? (
                 <MicOff className={"size-4"} />
@@ -56,15 +61,19 @@ export default function Controls() {
               )}
             </Toggle>
 
-            <div className={"relative grid h-8 w-48 shrink grow-0"}>
-              <MicFFT fft={micFft} className={"fill-current"} />
+            <div className="relative h-8 w-48 shrink grow-0 flex items-center">
+              {/* Audio visualization */}
+              <div 
+                className={cn(
+                  "h-2 bg-primary rounded-full transition-all duration-75 ease-in-out",
+                  isSpeaking ? "animate-pulse w-full" : "w-8"
+                )}
+              ></div>
             </div>
 
             <Button
               className={"flex items-center gap-1 rounded-full"}
-              onClick={() => {
-                disconnect();
-              }}
+              onClick={onEndCall}
               variant={"destructive"}
             >
               <span>

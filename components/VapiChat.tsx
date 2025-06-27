@@ -30,6 +30,7 @@ export default function VapiChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisDetails, setAnalysisDetails] = useState<string | null>(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages change
@@ -92,20 +93,24 @@ export default function VapiChat() {
           },
         ]);
         
-        // Try to restart the connection if it fails
-        setTimeout(() => {
-          if (!isConnected) {
+        // Only attempt to reconnect a maximum of 2 times
+        if (!isConnected && reconnectAttempts < 2) {
+          setReconnectAttempts(prev => prev + 1);
+          setTimeout(() => {
             const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
             if (assistantId && outfitDescription) {
+              console.log(`Attempting to reconnect (attempt ${reconnectAttempts + 1}/2)`);
               startVapiConversation(assistantId, outfitDescription);
             }
-          }
-        }, 3000);
+          }, 3000);
+        } else if (reconnectAttempts >= 2) {
+          console.log('Maximum reconnection attempts reached. Please try uploading a new image.');
+        }
       },
     });
 
     return cleanupListeners;
-  }, [outfitDescription, isConnected]);
+  }, [outfitDescription, isConnected, reconnectAttempts]);
 
   // Start the conversation when we get an outfit description
   useEffect(() => {
@@ -125,6 +130,7 @@ export default function VapiChat() {
   const handleImageAnalyzed = (description: string) => {
     setOutfitDescription(description);
     setIsAnalyzing(false);
+    setReconnectAttempts(0);
     
     // Extract a summary from the analysis for display
     const summaryMatch = description.match(/## COLOR IDENTIFICATION([\s\S]*?)##/);

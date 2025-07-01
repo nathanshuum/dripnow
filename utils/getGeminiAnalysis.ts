@@ -17,7 +17,7 @@ export type ImageData = {
 export async function analyzeOutfitImage(imageData: ImageData): Promise<string> {
   try {
     // For Gemini Pro Vision
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
     const prompt = `
       I am analyzing fashion for a colorblind person who needs help understanding colors and outfit coordination.
@@ -44,6 +44,7 @@ export async function analyzeOutfitImage(imageData: ImageData): Promise<string> 
       - Mention any potential challenging color distinctions in this outfit
       
       Be detailed but concise. Use objective descriptions that would be helpful for someone who cannot distinguish certain colors.
+      This description will be then fed into another AI model so make sure to give description, not a conversational response.
     `;
 
     const result = await model.generateContent([
@@ -55,9 +56,10 @@ export async function analyzeOutfitImage(imageData: ImageData): Promise<string> 
         }
       }
     ]);
-
+    console.log('Gemini raw result:', result);
     const response = result.response;
-    const text = response.text();
+    const text = await response.text();
+    console.log('Gemini response text:', text);
     return text;
   } catch (error) {
     console.error("Error analyzing image with Gemini:", error);

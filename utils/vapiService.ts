@@ -31,28 +31,20 @@ export function startVapiConversation(assistantId: string, outfitDescription: st
   const vapi = getVapiClient();
 
   // Pass the outfit description as initial context to the assistant
+  // Pass the gemini outfit description as initial context to the assistant
+  console.log("Starting VAPI conversation with gemini description:", outfitDescription);
   vapi.start(assistantId, {
-      firstMessage: `
-      You are a knowledgeable and empathetic fashion advisor specializing in helping colorblind individuals understand and coordinate their outfits.
-      
-      Here is a detailed analysis of the user's current outfit from our computer vision system:
-      
-      ${outfitDescription}
-      
-      Your role is to help the user understand how their outfit looks and provide practical fashion advice. Remember:
-      
-      1. Use clear, descriptive language when discussing colors
-      2. Explain color relationships in terms anyone can understand (warm/cool, light/dark)
-      3. Provide practical advice for identifying and remembering color combinations
-      4. Be positive and encouraging, focusing on what works well
-      5. When suggesting alternatives, be specific about why they would work better
-      6. Feel free to explain basic color theory concepts where relevant
-      7. If the user asks about specific color combinations, provide clear guidance
-
-      The user may have difficulty distinguishing certain colors, so focus on providing practical, actionable advice that doesn't rely solely on color perception.
-      
-      Respond conversationally as if you're having a natural voice conversation. Keep your responses concise but helpful.
-    `
+    model: {
+      provider: 'openai',
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: `The user has uploaded an image of their outfit. Here is the analysis from our vision model. Use this as context for your conversation. Do not mention this analysis unless the user asks about it. \n\nANALYSIS:\n${outfitDescription}`,
+        },
+      ],
+    },
+    firstMessageMode: 'assistant-waits-for-user',
   });
 }
 
